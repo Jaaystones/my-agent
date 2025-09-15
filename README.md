@@ -9,9 +9,10 @@ An intelligent code review agent powered by Google's Gemini AI model through the
 - 🔧 **Git Integration**: Automatically detects and analyzes git diffs
 - 🛠️ **Tool-Based Architecture**: Uses Vercel AI SDK's tool system for structured operations
 - 📝 **Expert Feedback**: Provides detailed reviews covering correctness, clarity, maintainability, and security
-- � **Commit Message Generation**: Creates conventional commit messages based on analyzed changes
+- 💬 **Commit Message Generation**: Creates conventional commit messages based on analyzed changes
 - 📄 **Markdown File Generation**: Automatically creates well-structured documentation files
-- �🚀 **Fast Runtime**: Built with Bun for optimal performance
+- 🎯 **Specialized Agents**: Separate agents for code review, commit messages, and documentation
+- 🚀 **Fast Runtime**: Built with Bun for optimal performance
 
 ## Prerequisites
 
@@ -75,48 +76,47 @@ The project uses the following key dependencies:
 
 ### Basic Usage
 
-Run the code review agent:
+The project now includes three specialized agents, each optimized for specific tasks:
 
+**Run all agents in sequence:**
 ```bash
 bun run index.ts
 ```
 
-### Customizing the Review Target
+**Available Agents:**
+1. **Code Review Agent** - Analyzes code changes and provides detailed feedback
+2. **Commit Message Agent** - Generates conventional commit messages
+3. **Markdown Documentation Agent** - Creates comprehensive documentation
 
-By default, the agent reviews changes in the `../my-agent` directory. To review a different directory, modify the prompt in `index.ts`:
+### Agent Customization
 
+#### Code Review Agent
 ```typescript
 await codeReviewAgent(
-  "Review the code changes in '/path/to/your/project' directory, make your reviews and suggestions file by file"
+  "Review the code changes in '/path/to/your/project' directory, make your reviews and suggestions file by file",
+  10 // Optional: max steps (default: 10)
 );
 ```
 
-### Using New Features
-
-#### Commit Message Generation
-
-Ask the agent to generate commit messages based on your changes:
-
+#### Commit Message Agent
 ```typescript
-await codeReviewAgent(
-  "Generate a conventional commit message for the changes in '../my-agent' directory"
+await codeCommitAgent(
+  "Generate a conventional commit message for the changes in '../my-agent' directory",
+  5 // Optional: max steps (default: 10)
 );
 ```
 
-#### Markdown Documentation Generation
-
-Request documentation creation:
-
+#### Markdown Documentation Agent
 ```typescript
-await codeReviewAgent(
-  "Create a markdown file documenting the new authentication feature at './docs/auth.md'"
+await codeMarkdownAgent(
+  "Generate a markdown file documenting the new features at '../my-agent' directory. Include overview, installation, usage examples, and configuration options.",
+  15 // Optional: max steps (default: 10)
 );
 ```
 
 ### Example Output
 
-The agent will analyze git diffs and provide structured feedback like:
-
+**Code Review Agent:**
 ```
 Reviewing file: src/utils/helper.ts
 ✅ Good use of TypeScript interfaces for type safety
@@ -125,8 +125,7 @@ Reviewing file: src/utils/helper.ts
 📈 Performance: This loop could be optimized using map() instead of forEach()
 ```
 
-For commit message generation:
-
+**Commit Message Agent:**
 ```
 Based on the changes analyzed, I suggest this commit message:
 feat(tools): add commit message generation and markdown file creation
@@ -137,38 +136,67 @@ feat(tools): add commit message generation and markdown file creation
 - Follow existing tool pattern with zod schemas
 ```
 
-For markdown generation:
-
+**Markdown Documentation Agent:**
 ```
 ✅ Created documentation file at ./docs/feature.md
 📄 Content: 1,247 characters
 📋 Includes: headings, code examples, and usage instructions
+🎯 Structured with proper hierarchy and formatting
 ```
 
 ## Project Structure
 
 ```
 my-agent/
-├── index.ts          # Main application entry point
-├── prompts.ts        # System prompts and AI instructions
-├── tools.ts          # AI tools and git integration
+├── index.ts          # Main application with three specialized agents
+├── prompts.ts        # Enhanced system prompts for all capabilities
+├── tools.ts          # AI tools: git analysis, commit generation, markdown creation
 ├── package.json      # Dependencies and scripts
 ├── tsconfig.json     # TypeScript configuration
 ├── bun.lock         # Lock file for dependencies
-└── README.md        # This file
+└── README.md        # This comprehensive documentation
 ```
+
+### Key Files Explained
+
+- **`index.ts`**: Contains three specialized agents:
+  - `codeReviewAgent`: Code analysis and feedback
+  - `codeCommitAgent`: Commit message generation
+  - `codeMarkdownAgent`: Documentation creation
+- **`prompts.ts`**: Enhanced system prompt with capabilities for all three agent types
+- **`tools.ts`**: Three main tools with type-safe schemas:
+  - `getFileChangesInDirectoryTool`
+  - `generateCommitMessageTool` 
+  - `generateMarkdownFileTool`
 
 ## Configuration
 
 ### AI Model Configuration
 
-The project uses Google's Gemini 2.5 Flash model. You can modify the model in `index.ts`:
+The project uses Google's Gemini 2.5 Flash model across all agents. You can modify the model in each agent function in `index.ts`:
 
 ```typescript
+// Example for codeReviewAgent
 const result = streamText({
   model: google("models/gemini-2.5-flash"), // Change model here
-  // ... other options
+  prompt,
+  system: SYSTEM_PROMPT,
+  tools: { getFileChangesInDirectoryTool },
+  stopWhen: stepCountIs(maxSteps),
 });
+```
+
+### Agent Step Configuration
+
+Each agent accepts a `maxSteps` parameter to control the maximum number of tool calls:
+
+```typescript
+// Default: 10 steps
+await codeReviewAgent("Your prompt here");
+
+// Custom step limit
+await codeCommitAgent("Your prompt here", 5);
+await codeMarkdownAgent("Your prompt here", 15);
 ```
 
 ### Review Scope Customization
@@ -224,10 +252,33 @@ export const yourNewTool = tool({
 
 ### Core Functions
 
-- `codeReviewAgent(prompt: string)` - Main function that orchestrates the code review
-- `getFileChangesInDirectoryTool` - Tool that retrieves git diffs for analysis
-- `generateCommitMessageTool` - Tool that analyzes changes and suggests conventional commit messages
-- `generateMarkdownFileTool` - Tool that creates markdown files with specified content
+- `codeReviewAgent(prompt: string, maxSteps?: number)` - Analyzes code changes and provides detailed feedback
+- `codeCommitAgent(prompt: string, maxSteps?: number)` - Generates conventional commit messages based on changes
+- `codeMarkdownAgent(prompt: string, maxSteps?: number)` - Creates comprehensive markdown documentation
+- `streamAgentOutput(textStream: AsyncIterable<string>)` - Helper function to stream AI responses
+
+### Specialized Agent Functions
+
+#### codeReviewAgent
+```typescript
+await codeReviewAgent(prompt: string, maxSteps: number = 10)
+// Tools available: getFileChangesInDirectoryTool
+// Purpose: Code analysis, review feedback, best practices
+```
+
+#### codeCommitAgent
+```typescript
+await codeCommitAgent(prompt: string, maxSteps: number = 10)
+// Tools available: generateCommitMessageTool
+// Purpose: Conventional commit message generation
+```
+
+#### codeMarkdownAgent
+```typescript
+await codeMarkdownAgent(prompt: string, maxSteps: number = 10)
+// Tools available: generateMarkdownFileTool
+// Purpose: Documentation creation and file generation
+```
 
 ### Tool Schemas
 
