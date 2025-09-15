@@ -79,11 +79,13 @@ The project uses the following key dependencies:
 The project now includes three specialized agents, each optimized for specific tasks:
 
 **Run all agents in sequence:**
+
 ```bash
 bun run index.ts
 ```
 
 **Available Agents:**
+
 1. **Code Review Agent** - Analyzes code changes and provides detailed feedback
 2. **Commit Message Agent** - Generates conventional commit messages
 3. **Markdown Documentation Agent** - Creates comprehensive documentation
@@ -91,6 +93,7 @@ bun run index.ts
 ### Agent Customization
 
 #### Code Review Agent
+
 ```typescript
 await codeReviewAgent(
   "Review the code changes in '/path/to/your/project' directory, make your reviews and suggestions file by file",
@@ -99,6 +102,7 @@ await codeReviewAgent(
 ```
 
 #### Commit Message Agent
+
 ```typescript
 await codeCommitAgent(
   "Generate a conventional commit message for the changes in '../my-agent' directory",
@@ -107,6 +111,7 @@ await codeCommitAgent(
 ```
 
 #### Markdown Documentation Agent
+
 ```typescript
 await codeMarkdownAgent(
   "Generate a markdown file documenting the new features at '../my-agent' directory. Include overview, installation, usage examples, and configuration options.",
@@ -117,6 +122,7 @@ await codeMarkdownAgent(
 ### Example Output
 
 **Code Review Agent:**
+
 ```
 Reviewing file: src/utils/helper.ts
 ✅ Good use of TypeScript interfaces for type safety
@@ -126,6 +132,7 @@ Reviewing file: src/utils/helper.ts
 ```
 
 **Commit Message Agent:**
+
 ```
 Based on the changes analyzed, I suggest this commit message:
 feat(tools): add commit message generation and markdown file creation
@@ -137,6 +144,7 @@ feat(tools): add commit message generation and markdown file creation
 ```
 
 **Markdown Documentation Agent:**
+
 ```
 ✅ Created documentation file at ./docs/feature.md
 📄 Content: 1,247 characters
@@ -166,7 +174,7 @@ my-agent/
 - **`prompts.ts`**: Enhanced system prompt with capabilities for all three agent types
 - **`tools.ts`**: Three main tools with type-safe schemas:
   - `getFileChangesInDirectoryTool`
-  - `generateCommitMessageTool` 
+  - `generateCommitMessageTool`
   - `generateMarkdownFileTool`
 
 ## Configuration
@@ -260,6 +268,7 @@ export const yourNewTool = tool({
 ### Specialized Agent Functions
 
 #### codeReviewAgent
+
 ```typescript
 await codeReviewAgent(prompt: string, maxSteps: number = 10)
 // Tools available: getFileChangesInDirectoryTool
@@ -267,6 +276,7 @@ await codeReviewAgent(prompt: string, maxSteps: number = 10)
 ```
 
 #### codeCommitAgent
+
 ```typescript
 await codeCommitAgent(prompt: string, maxSteps: number = 10)
 // Tools available: generateCommitMessageTool
@@ -274,6 +284,7 @@ await codeCommitAgent(prompt: string, maxSteps: number = 10)
 ```
 
 #### codeMarkdownAgent
+
 ```typescript
 await codeMarkdownAgent(prompt: string, maxSteps: number = 10)
 // Tools available: generateMarkdownFileTool
